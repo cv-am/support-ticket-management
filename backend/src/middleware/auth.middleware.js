@@ -1,12 +1,14 @@
 import jwt from "jsonwebtoken";
+import config from "../config/env.js";
 
-const protect = async(req,res,next) => {
+export const protect = async(req,res,next) => {
     const token = req.cookies.token
     if(!token){
         return res.status(401).json({success: false, message: "Unauthorized"})
     }
     try{
-        const decoded = jwt.verify(token,process.env.JWT_SECRET)
+        const decoded = jwt.verify(token,config.jwt.secret)
+        console.log("JWT verification success:", decoded);
         req.user = decoded
         next()
     }catch(error){

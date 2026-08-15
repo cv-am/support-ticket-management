@@ -1,16 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { pool } from "../../db/db.js";
-import dotenv from "dotenv"
+import config from "../../config/env.js";
 import QUERIES from "./auth.query.js";
-
-dotenv.config()
 
 const signToken = (user) =>{
     return jwt.sign(
         { id: user.id, email: user.email, role:user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN }
+        config.jwt.secret,
+        { expiresIn: config.jwt.expiresIn }
     )
 }
 
