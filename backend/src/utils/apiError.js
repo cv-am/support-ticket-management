@@ -1,10 +1,11 @@
-export const apiError = (statusCode, message, errors = null) => {
-    const error = new Error(message);
-    error.statusCode = statusCode;
-    error.errors = errors;
-    error.isOperational = true;
-    Error.captureStackTrace(error, apiError);
-    return error;
-};
+export class ApiError extends Error {
+    constructor(statusCode, message, errors = null) {
+        super(message);
+        this.statusCode = statusCode;
+        this.errors = errors;
+        this.isOperational = true;
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
 
-export default apiError;
+export default ApiError;

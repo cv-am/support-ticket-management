@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { pool } from "../../db/db.js";
 import config from "../../config/env.js";
+import ApiError from "../../utils/apiError.js";
 import QUERIES from "./auth.query.js";
 
 const signToken = (user) =>{
@@ -15,10 +16,7 @@ const signToken = (user) =>{
 export const register = async ({ name, email, password, role = "Customer" }) => {
     const [existing] = await pool.query(QUERIES.FIND_BY_EMAIL, [email])
     if (existing.length) {
-        return {
-            status: 409,
-            message: "An account with this email already exists"
-        }
+        throw new ApiError(409, "An account with this email already exists")
     }
 
     const hashed = await bcrypt.hash(password, 10)
@@ -37,19 +35,13 @@ export const register = async ({ name, email, password, role = "Customer" }) => 
 export const login = async ({ email, password }) => {
     const [rows] = await pool.query(QUERIES.FIND_BY_EMAIL,[email])
     if (!rows.length) {
-        return {
-            status: 401,
-            message: "Invalid email or password"
-        }
+        throw new ApiError(401, "Invalid email or password")
     }
 
     const record = rows[0]
     const match = await bcrypt.compare(password, record.password)
     if(!match) {
-        return{
-            status: 401,
-            message: "Invalid email or password"
-        }
+        throw new ApiError(401, "Invalid email or password")
     }
 
     const token = signToken(record)

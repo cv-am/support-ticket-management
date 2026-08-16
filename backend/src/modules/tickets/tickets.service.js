@@ -1,11 +1,8 @@
 import { pool } from "../../db/db.js";
+import ApiError from "../../utils/apiError.js";
 import QUERIES from "./ticket.query.js";
 
 export const createTicket = async ({ title, description, priority = "medium", assigned_to = null }, createdBy) => {
-    if (!title || !description) {
-        return { status: 400, message: "title and description are required" }
-    }
-
     const [result] = await pool.query(QUERIES.CREATE, [
         title, description, priority, "open", createdBy, assigned_to
     ])
@@ -17,7 +14,7 @@ export const createTicket = async ({ title, description, priority = "medium", as
 export const getTicketById = async (id) => {
     const [rows] = await pool.query(QUERIES.FIND_BY_ID, [id])
     if (!rows.length) {
-        return { status: 404, message: "Ticket not found" }
+        throw new ApiError(404, "Ticket not found")
     }
     return { status: 200, message: "Ticket fetched", data: rows[0] }
 }
@@ -47,12 +44,12 @@ export const listTickets = async (requester, { page = 1, limit = 20, status, pri
 export const updateTicket = async (id, requester, payload) => {
     const [existingRows] = await pool.query(QUERIES.FIND_BY_ID, [id])
     if (!existingRows.length) {
-        return { status: 404, message: "Ticket not found" }
+        throw new ApiError(404, "Ticket not found")
     }
     const ticket = existingRows[0]
 
     if (requester.role === "Customer" && ticket.created_by !== requester.id) {
-        return { status: 403, message: "You can only update tickets you created" }
+        throw new ApiError(403, "You can only update tickets you created")
     }
 
     const title = payload.title ?? ticket.title
@@ -70,10 +67,10 @@ export const updateTicket = async (id, requester, payload) => {
 export const deleteTicket = async (id, requester) => {
     const [rows] = await pool.query(QUERIES.FIND_BY_ID, [id])
     if (!rows.length) {
-        return { status: 404, message: "Ticket not found" }
+        throw new ApiError(404, "Ticket not found")
     }
     if (requester.role === "Customer" && rows[0].created_by !== requester.id) {
-        return { status: 403, message: "You can only delete tickets you created" }
+        throw new ApiError(403, "You can only delete tickets you created")
     }
 
     await pool.query(QUERIES.DELETE, [id])
