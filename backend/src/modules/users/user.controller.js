@@ -12,12 +12,12 @@ export const getOne = async (req, res) => {
 }
 
 export const update = async (req, res) => {
-    const response = await userService.updateUser(req.user.id, req.body)
+    const response = await userService.updateUser(req.params.id || req.user.id, req.body)
     return success(res, response.status, response.message, response.data)
 }
 
 export const remove = async (req, res) => {
-    const response = await userService.deleteUser(req.user.id, req.body.password)
+    const response = await userService.deleteUser(req.params.id || req.user.id, req.body)
     return success(res, response.status, response.message)
 }
 

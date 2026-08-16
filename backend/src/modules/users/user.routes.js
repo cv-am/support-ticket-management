@@ -9,10 +9,12 @@ const router = Router()
 
 router.use(protect)
 
-router.get("/", allowRoles("Admin"),listUsersRules,validate, userController.getAll)
+router.get("/", allowRoles("Admin", "A"),listUsersRules,validate, userController.getAll)
+router.patch("/:id/update", allowRoles("Admin"),updateUserRules,validate, userController.update)
+router.delete("/:id/delete", allowRoles("Admin"),userController.remove)
 router.get("/me", userController.getOne)
-router.patch("/update", updateUserRules, validate, userController.update)
-router.delete("/delete", allowRoles("Admin"), userController.remove)
-router.patch("/update/password", updatePasswordRules, validate, userController.updatePassword)
+router.patch("/me/update", updateUserRules, validate, userController.update)
+router.delete("/me/delete", userController.remove)
+router.patch("/me/update/password", updatePasswordRules, validate, userController.updatePassword)
 
 export default router
