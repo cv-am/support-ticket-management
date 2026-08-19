@@ -1,7 +1,7 @@
 import { body, param, query } from "express-validator";
 
 export const userIdParam = [
-    param("id").isInt({ min: 1 }).withMessage("id must be a positive integer"),
+    param("id").optional().isInt({ min: 1 }).withMessage("id must be a positive integer"),
 ];
 
 export const updateUserRules = [
@@ -18,6 +18,6 @@ export const listUsersRules = [
 ];
 
 export const updatePasswordRules = [
-    ...userIdParam,
-    body("password").isLength({ min: 8 }).withMessage("password must be at least 8 characters"),
+    body("current_password").notEmpty().withMessage("current_password is required"),
+    body("new_password").isLength({ min: 8 }).withMessage("new_password must be at least 8 characters"),
 ]

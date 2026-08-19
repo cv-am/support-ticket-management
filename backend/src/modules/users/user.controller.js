@@ -17,11 +17,11 @@ export const update = async (req, res) => {
 }
 
 export const remove = async (req, res) => {
-    const response = await userService.deleteUser(req.params.id || req.user.id, req.body)
+    const response = await userService.deleteUser(req.params.id || req.user.id, req.body, req.user)
     return success(res, response.status, response.message)
 }
 
 export const updatePassword = async (req, res) => {
-    const response = await userService.updatePassword(req.user.id, req.body.password)
+    const response = await userService.updatePassword(req.user.id, req.body)
     return success(res, response.status, response.message)
 }

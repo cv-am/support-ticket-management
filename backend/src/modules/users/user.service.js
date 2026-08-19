@@ -13,7 +13,8 @@ export const listUsers = async ({limit = 10, page = 1}) => {
 export const getUserById = async (id) => {
     const [rows] = await pool.query(QUERIES.FIND_BY_ID,[id])
     if (!rows.length) throw new ApiError(404, "User not found")
-    return { status: 200, message: "User fetched", data: rows[0] }
+    const { password, ...user } = rows[0]
+    return { status: 200, message: "User fetched", data: user }
 }
 
 export const updateUser = async (id, { name }) => {
@@ -21,14 +22,14 @@ export const updateUser = async (id, { name }) => {
     if (!rows.length) throw new ApiError(404, "User not found")
     const updatedName = name ?? rows[0].name
     await pool.query(QUERIES.UPDATE, [updatedName, id])
-    const [updated] = await pool.query(QUERIES.FIND_BY_ID, [id])
-    return { status: 200, message: "User updated", data: updated[0] }
+    return { status: 200, message: "User updated", data: {name: updatedName} }
 }
 
-export const deleteUser = async (id,password) => {
+export const deleteUser = async (id,{ password }) => {
     const [rows] = await pool.query(QUERIES.FIND_BY_ID, [id])
     if (!rows.length) throw new ApiError(404, "User not found")
-    if ( rows[0].role == "Admin") throw new ApiError(400, "You cannot delete admin")
+    if (rows[0].role === "Admin") throw new ApiError(400, "You cannot delete Admin")
+    if (!password) throw new ApiError(400, "Password is required")
     const checkPassword = await bcrypt.compare(password, rows[0].password)
     if(!checkPassword) throw new ApiError(401, "Incorrect password")
 
@@ -37,11 +38,12 @@ export const deleteUser = async (id,password) => {
 }
 
 
-export const updatePassword = async (id, password) => {
+export const updatePassword = async (id, { current_password, new_password }) => {
     const [rows] = await pool.query(QUERIES.FIND_BY_ID, [id])
     if (!rows.length) throw new ApiError(404, "User not found")
-    
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const checkPassword = await bcrypt.compare(current_password, rows[0].password)
+    if(!checkPassword) throw new ApiError(401, "Incorrect password")
+    const hashedPassword = await bcrypt.hash(new_password, 10)
     await pool.query(QUERIES.UPDATE_PASSWORD, [hashedPassword, id])
     return { status: 200, message: "Password updated" }
 }

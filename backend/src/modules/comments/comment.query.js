@@ -8,7 +8,7 @@ export const QUERIES = {
                       ORDER BY c.created_at ASC
                       LIMIT ? OFFSET ?`,
     COUNT_BY_TICKET: `SELECT COUNT(*) AS total FROM comments WHERE ticket_id = ?`,
-    UPDATE: `UPDATE comments SET content = ? WHERE id = ?`,
+    UPDATE: `UPDATE comments SET content = ?, updated_at = NOW() WHERE id = ?`,
     DELETE: `DELETE FROM comments WHERE id = ?`,
     FIND_TICKET: `SELECT id FROM tickets WHERE id = ? LIMIT 1`,
 };

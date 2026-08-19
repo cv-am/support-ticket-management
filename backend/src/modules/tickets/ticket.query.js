@@ -13,7 +13,7 @@ export const QUERIES = {
     COUNT: (whereClause) => `SELECT COUNT(*) AS total FROM tickets ${whereClause}`,
 
     UPDATE: `UPDATE tickets
-              SET title = ?, description = ?, priority = ?, status = ?, assigned_to = ?
+              SET title = ?, description = ?, priority = ?, status = ?, assigned_to = ? , updated_at = NOW()
               WHERE id = ?`,
 
     DELETE: `DELETE FROM tickets WHERE id = ?`,

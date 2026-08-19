@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 
 dotenv.config()
 
-export const config = {
+const config = {
     port: Number(process.env.PORT) || 2006,
     db: {
         host: process.env.DB_HOST,
